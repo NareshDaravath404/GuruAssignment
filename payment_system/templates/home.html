@@ -1,0 +1,76 @@
+<!-- wallet/templates/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment System</title>
+    <script>
+        function startTimer(user_id) {
+            fetch('/start_timer/', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'user_id': user_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                // Start the timer countdown on the HTML page
+                document.getElementById(`timer-${user_id}`).innerHTML = 'Timer: 1:00';
+                var timeLeft = 60;
+                var timer = setInterval(function() {
+                    timeLeft--;
+                    var minutes = Math.floor(timeLeft / 60);
+                    var seconds = timeLeft % 60;
+                    document.getElementById(`timer-${user_id}`).innerHTML = `Timer: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        document.getElementById(`timer-${user_id}`).innerHTML = 'Timer: Expired';
+                    }
+                }, 1000);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function stopTimer(user_id) {
+            fetch('/stop_timer/', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'user_id': user_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.remaining_coins);
+                // Update the remaining wallet balance on the HTML page
+                document.getElementById(`balance-${user_id}`).innerHTML = `Wallet Balance: ${data.remaining_coins}`;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Users</h1>
+    <ul>
+        {% for user in users %}
+        <li>
+            <p>User ID: {{ user.id }}</p>
+            <p>Name: {{ user.name }}</p>
+            <p id="balance-{{ user.id }}">Wallet Balance: {{ user.wallet_balance }}</p>
+            <button onclick="startTimer({{ user.id }})">Start Timer</button>
+            <button onclick="stopTimer({{ user.id }})">Stop Timer</button>
+            <p id="timer-{{ user.id }}"></p>
+        </li>
+        <hr>
+        {% endfor %}
+        {% for transaction in transactions %}
+        <li>
+            <p>{{transaction.user}}:{{transaction.coins}} coins at {{transaction.timestamp}}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
