@@ -1,8 +1,8 @@
 # GuruAssignment
 requirements :
-django - pip install django 
-python 
-rest_framework - pip install rest_framework
+1.django - pip install django 
+2.python 
+3.rest_framework - pip install rest_framework
 
 To Run Application :
 1.make migrations 
