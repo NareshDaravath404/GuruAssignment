@@ -1,6 +1,7 @@
 # wallet/views.py
+from email import message
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Transaction
 import threading
@@ -26,9 +27,6 @@ def start_timer(request):
     user_id = request.POST.get("user_id")
     user = User.objects.get(id=user_id)
 
-    if timer_running:
-        return JsonResponse({"message": "Timer is already running."})
-    
     timer_running = True
 
     # Start the timer thread
@@ -42,18 +40,38 @@ def stop_timer(request):
     user_id = request.POST.get("user_id")
     user = User.objects.get(id=user_id)
 
-    if not timer_running:
-        return JsonResponse({"message": "Timer is not running."})
-    
     timer_running = False
 
     transactions = Transaction.objects.filter(user=user)
-    total_coins = sum(transaction.coins for transaction in transactions)
-    remaining_coins = user.wallet_balance + total_coins
+    remaining_coins = user.wallet_balance
 
     return JsonResponse({"remaining_coins": remaining_coins})
 
 def home(request):
-    users = User.objects.all()
-    transactions=Transaction.objects.all()
-    return render(request, 'home.html', {'users': users,'transactions':transactions})
+    if request.method=="POST":
+        name=request.POST['name']
+        user=User.objects.filter(name=name)
+        if user is not None:
+            users = user
+            transactions=Transaction.objects.all()
+            return render(request, 'home.html', {'users': users,'transactions':transactions.reverse})
+        else:
+            message.error(request,"You are not a active user")
+
+def signin(request):
+    return render(request,'userpage.html')
+
+def signup(request):
+    return render(request,'signin.html')
+
+def addcoins(request):
+    if request.method=="POST":
+        name=request.POST['name']
+        balance=request.POST['balance']
+        myuser=User(name=name,wallet_balance=balance)
+        myuser.save()
+        return render(request,'userpage.html')
+
+
+
+

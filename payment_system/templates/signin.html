@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>User Signin Page</title>
+      <link rel="stylesheet" href=" {% static 'style.css' %}">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+   </head>
+   <body>
+      <div class="center">
+         <input type="checkbox" id="show">
+         <label for="show" class="show-btn">Click here to Signin</label>
+         <div class="container">
+            <label for="show" class="close-btn fas fa-times" title="close"></label>
+            <div class="text">
+               Signin Form
+            </div>
+            <form action="addcoins/" method="post">
+                {% csrf_token %}
+               <div class="data">
+                  <input type="text" required name='name' placeholder="Enter Name">
+               </div>
+               <div class="data">
+                <input type="text" required name='balance' placeholder="Enter Coins">
+             </div>
+               <div class="btn">
+                  <div class="inner"></div>
+                  <button type="submit">Signin</button>
+               </div>
+               <div class="signup-link">
+                  Already have an account? <a href="">Login Now</a>
+               </div>
+            </form>
+         </div>
+      </div>
+   </body>
+</html>
